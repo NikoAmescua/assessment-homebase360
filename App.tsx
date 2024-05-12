@@ -1,20 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import Form from './components/Form';
+import { useState } from 'react';
+import { View, Text, Modal, Pressable } from 'react-native';
+import globalStyles from './globalStyle';
 
 export default function App() {
+  const [openModal, setOpenModal] = useState('');
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.text}>Home</Text>
+      <Pressable style={globalStyles.pressable} onPress={() => setOpenModal('form')}>
+        <Text style={globalStyles.pressableText}>Add User</Text>
+      </Pressable>
+
+      <Modal visible={openModal === 'form'}>
+        <View style={globalStyles.container}>
+          <Text style={globalStyles.text}>Fill in your info:</Text>
+          <Form setOpenModal={setOpenModal} />
+        </View>
+      </Modal>
+
+      <Modal visible={openModal === 'success'}>
+        <View style={globalStyles.container}>
+          <Text style={globalStyles.text}>Data successfully saved</Text>
+        </View>
+      </Modal>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
