@@ -1,30 +1,52 @@
-import Form from './components/Form';
 import { useState } from 'react';
-import { View, Text, Modal, Pressable } from 'react-native';
+import { View, Text, Modal, Pressable, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import globalStyles from './globalStyle';
+import Transaction from './components/Transaction';
+import type { transactions } from './types';
+import People from './components/People';
+import Generate from './components/Generate';
 
 export default function App() {
-  const [openModal, setOpenModal] = useState('');
+  const [transactionsState, setTransactionsState] = useState<transactions>([]);
+  const [peopleState, setPeopleState] = useState<string[]>([]);
+
+  const addTransaction = () => {
+    setTransactionsState((prev) => {
+      return [...prev, { transactionName: 'Transaction', creditor: '', payments: [], tax: 0, tip: 0 }];
+    });
+  };
 
   return (
-    <View style={globalStyles.container}>
-      <Text style={globalStyles.text}>Home</Text>
-      <Pressable style={globalStyles.pressable} onPress={() => setOpenModal('form')}>
-        <Text style={globalStyles.pressableText}>Add User</Text>
-      </Pressable>
-
-      <Modal visible={openModal === 'form'}>
-        <View style={globalStyles.container}>
-          <Text style={globalStyles.text}>Fill in your info:</Text>
-          <Form setOpenModal={setOpenModal} />
-        </View>
-      </Modal>
-
-      <Modal visible={openModal === 'success'}>
-        <View style={globalStyles.container}>
-          <Text style={globalStyles.text}>Data successfully saved</Text>
-        </View>
-      </Modal>
-    </View>
+    <SafeAreaView>
+      <ScrollView>
+        <Text style={localStyle.title}>Split it up!</Text>
+        <People peopleState={peopleState} setPeopleState={setPeopleState} />
+        {transactionsState.map((transactionData, i) => (
+          <Transaction
+            key={'transaction' + i}
+            transactionIndex={i}
+            transactionData={transactionData}
+            setTransactionsState={setTransactionsState}
+            peopleState={peopleState}
+          />
+        ))}
+        <Pressable onPress={addTransaction} style={globalStyles.pressable}>
+          <Text style={globalStyles.pressableText}>Add Transaction</Text>
+        </Pressable>
+        <Generate transactionsState={transactionsState} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const localStyle = StyleSheet.create({
+  scrollView: {
+    // paddingTop:
+  },
+  title: {
+    textAlign: 'center',
+    margin: 20,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+});
