@@ -36,8 +36,13 @@ export default function LineItem({
 
   return (
     <View style={globalStyles.lineItemContainer}>
-      <TextInput style={[globalStyles.lineItemText, globalStyles.borderedInput]}>{name}</TextInput>
-      <DropDown peopleState={peopleState} />
+      <TextInput
+        onChangeText={(text) => handleUpdateValue(text, 'name')}
+        style={[globalStyles.lineItemText, globalStyles.borderedInput]}
+      >
+        {name}
+      </TextInput>
+      <DropDown handleUpdateValue={handleUpdateValue} stateValue={person} peopleState={peopleState} />
       <TextInput
         onChangeText={(text) => handleUpdateValue(text, 'amount')}
         inputMode='numeric'

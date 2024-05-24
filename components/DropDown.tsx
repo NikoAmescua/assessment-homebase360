@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { payment } from '../types';
 
 interface dropDownProps {
   peopleState: string[];
+  stateValue: string;
+  handleUpdateValue: (value: string, field: keyof payment) => void;
 }
 
-const DropdownComponent = ({ peopleState }: dropDownProps) => {
+const DropdownComponent = ({ peopleState, stateValue, handleUpdateValue }: dropDownProps) => {
   const [value, setValue] = useState<null | string>(null);
   const [isFocus, setIsFocus] = useState(false);
 
@@ -35,11 +38,11 @@ const DropdownComponent = ({ peopleState }: dropDownProps) => {
         valueField='value'
         placeholder={!isFocus ? 'Select item' : '...'}
         searchPlaceholder='Search...'
-        value={value}
+        value={stateValue}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
-          setValue(item.value);
+          handleUpdateValue(item.value, 'person');
           setIsFocus(false);
         }}
       />
@@ -51,7 +54,6 @@ export default DropdownComponent;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     width: 120,
     padding: 16,
   },

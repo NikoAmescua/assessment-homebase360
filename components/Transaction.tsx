@@ -4,6 +4,7 @@ import globalStyles from '../globalStyle';
 import type { transaction, transactions } from '../types';
 import LineItem from './LineItem';
 import { globalAgent } from 'http';
+import DropDown from './DropDown';
 
 interface TransactionProps {
   transactionData: transaction;
@@ -19,9 +20,10 @@ export default function Transaction({
   peopleState,
 }: TransactionProps) {
   const calculateTotal = () => {
-    return transactionData.payments.reduce((accum, curr) => {
+    const subtotal = transactionData.payments.reduce((accum, curr) => {
       return curr.amount + accum;
     }, 0);
+    return (subtotal * (transactionData.tax + transactionData.tip + 100)) / 100;
   };
 
   const handleDelete = () => {
@@ -50,14 +52,52 @@ export default function Transaction({
     });
   };
 
+  const handleUpdateTaxOrTip = function (value: string, field: 'tax' | 'tip') {
+    setTransactionsState((p) => {
+      const newTransactions = [...p];
+      const newTransaction = { ...newTransactions[transactionIndex] };
+      newTransaction[field] = Number(value.replace(/[^0-9]/g, ''));
+      newTransactions[transactionIndex] = newTransaction;
+      return newTransactions;
+    });
+  };
+
   return (
+    // title
     <View style={globalStyles.container}>
       <TextInput style={globalStyles.subHead} onChangeText={handleRenameTransaction}>
         {transactionData.transactionName}
       </TextInput>
 
+      {/* creditor */}
+      <View
+        style={{
+          marginRight: 'auto',
+          marginLeft: 10,
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        }}
+      >
+        <Text>Paid for by: </Text>
+        <DropDown
+          handleUpdateValue={(value: string) => {
+            setTransactionsState((p) => {
+              const newTransactions = [...p];
+              const newTransaction = { ...newTransactions[transactionIndex] };
+              newTransaction.creditor = value;
+              newTransactions[transactionIndex] = newTransaction;
+              return newTransactions;
+            });
+          }}
+          stateValue={transactionData.creditor}
+          peopleState={peopleState}
+        />
+      </View>
+
       {/* table */}
-      <View style={{ flex: 1, flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
+      <View style={{ flex: 1, flexDirection: 'column', width: '100%', backgroundColor: 'white', marginBottom: 10 }}>
         <View style={[globalStyles.lineItemContainer, { paddingVertical: 20 }]}>
           <Text style={[globalStyles.lineItemText, { fontWeight: 'bold' }]}>Item</Text>
           <Text style={[globalStyles.lineItemText, { fontWeight: 'bold' }]}>Person</Text>
@@ -77,21 +117,31 @@ export default function Transaction({
         })}
       </View>
 
+      <Button onPress={handleAddPayment} title='add item' />
+
       {/* totals */}
-      <View style={{ flex: 1, flexDirection: 'row', marginTop: 20 }}>
+      <View style={{ flex: 1, flexDirection: 'row', marginTop: 10 }}>
         <View style={{ marginRight: 20 }}>
           <Text>Tip %</Text>
-          <TextInput style={globalStyles.borderedInput} />
+          <TextInput
+            onChangeText={(value) => {
+              handleUpdateTaxOrTip(value, 'tip');
+            }}
+            style={globalStyles.borderedInput}
+          >
+            {transactionData.tip}
+          </TextInput>
         </View>
         <View>
           <Text>Tax %</Text>
-          <TextInput style={globalStyles.borderedInput} />
+          <TextInput onChangeText={(value) => handleUpdateTaxOrTip(value, 'tax')} style={globalStyles.borderedInput}>
+            {transactionData.tax}
+          </TextInput>
         </View>
       </View>
 
-      <Text>Total: ${calculateTotal()}</Text>
+      <Text style={{ marginTop: 10, fontWeight: 'bold', fontSize: 16 }}>Total: ${calculateTotal()}</Text>
 
-      <Button onPress={handleAddPayment} title='add item' />
       <Button onPress={handleDelete} title='delete transaction' />
     </View>
   );

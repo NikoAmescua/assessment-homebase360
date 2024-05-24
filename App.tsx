@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Modal, Pressable, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, Modal, Pressable, ScrollView, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import globalStyles from './globalStyle';
 import Transaction from './components/Transaction';
 import type { transactions } from './types';
@@ -17,7 +17,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ minHeight: Dimensions.get('window').height }}>
       <ScrollView>
         <Text style={localStyle.title}>Split it up!</Text>
         <People peopleState={peopleState} setPeopleState={setPeopleState} />
@@ -33,16 +33,14 @@ export default function App() {
         <Pressable onPress={addTransaction} style={globalStyles.pressable}>
           <Text style={globalStyles.pressableText}>Add Transaction</Text>
         </Pressable>
-        <Generate transactionsState={transactionsState} />
+        <Generate peopleState={peopleState} transactionsState={transactionsState} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const localStyle = StyleSheet.create({
-  scrollView: {
-    // paddingTop:
-  },
+  scrollView: {},
   title: {
     textAlign: 'center',
     margin: 20,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Modal, Pressable, StyleSheet, TextInput } from 'react-native';
+import { View, Text, Modal, Pressable, StyleSheet, TextInput, Alert } from 'react-native';
 import globalStyles from '../globalStyle';
 import type { transaction } from '../types';
 
@@ -9,13 +9,13 @@ interface PeopleProps {
 }
 
 export default function People({ peopleState, setPeopleState }: PeopleProps) {
-  const [inputName, setInputName] = useState('');
-
   const handleAddPerson = () => {
-    setPeopleState((p) => {
-      return [...p, inputName];
+    Alert.prompt('Add a person', 'type their name here', (value) => {
+      if (!value.trim()) return;
+      setPeopleState((p) => {
+        return [...p, value];
+      });
     });
-    setInputName('');
   };
 
   const handleRemovePerson = (indexToDelete: number) => {
@@ -41,15 +41,7 @@ export default function People({ peopleState, setPeopleState }: PeopleProps) {
           </Pressable>
         </View>
       ))}
-
-      <TextInput
-        id='name-input'
-        value={inputName}
-        onChangeText={(val) => setInputName(val)}
-        placeholder='add a person'
-        style={{ marginTop: 20, marginBottom: 10 }}
-      />
-      <Pressable disabled={inputName === ''} onPress={handleAddPerson} style={globalStyles.pressable}>
+      <Pressable onPress={handleAddPerson} style={[globalStyles.pressable, { marginVertical: 20 }]}>
         <Text style={globalStyles.pressableText}>Add Person</Text>
       </Pressable>
     </View>
